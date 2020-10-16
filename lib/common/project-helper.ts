@@ -24,19 +24,22 @@ export class ProjectHelper implements IProjectHelper {
 
 		let projectDir = path.resolve(this.$options.path || ".");
 		while (true) {
-			this.$logger.trace("Looking for project in '%s'", projectDir);
 			const projectFilePath = path.join(
 				projectDir,
 				this.$staticConfig.PROJECT_FILE_NAME
 			);
+			this.$logger.trace("Looking for project file '%s'", projectFilePath);
 
-			if (
-				this.$fs.exists(projectFilePath) &&
-				this.isProjectFileCorrect(projectFilePath)
-			) {
-				this.$logger.debug("Project directory is '%s'.", projectDir);
-				this.cachedProjectDir = projectDir;
-				break;
+			if (this.$fs.exists(projectFilePath)) {
+				if (this.isProjectFileCorrect(projectFilePath)) {
+					this.$logger.debug("Project directory is '%s'.", projectDir);
+					this.cachedProjectDir = projectDir;
+					break;
+				} else {
+					this.$logger.trace(
+						"Found project file but it does not contain nativescript core libraries"
+					);
+				}
 			}
 
 			const dir = path.dirname(projectDir);
